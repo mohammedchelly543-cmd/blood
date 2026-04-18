@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}Mon espace donneur{% endblock %}
+{% block content %}
+
+<h2 class="text-danger mb-4">Bonjour, {{ donneur.user.get_full_name }} 👋</h2>
+
+<!-- Statut éligibilité -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm text-center py-3 h-100">
+      <div style="font-size:2rem;">🩸</div>
+      <h5 class="mt-2">Groupe sanguin</h5>
+      <span class="badge bg-danger fs-5">{{ donneur.groupe_sanguin }}</span>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm text-center py-3 h-100">
+      <div style="font-size:2rem;">{% if eligible %}✅{% else %}⏳{% endif %}</div>
+      <h5 class="mt-2">Éligibilité</h5>
+      {% if eligible %}
+        <span class="badge bg-success">Vous pouvez donner</span>
+      {% else %}
+        <span class="badge bg-warning text-dark">
+          Prochain don : {{ prochain_don|date:"d/m/Y" }}
+        </span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm text-center py-3 h-100">
+      <div style="font-size:2rem;">📊</div>
+      <h5 class="mt-2">Total dons</h5>
+      <h3 class="fw-bold text-danger">{{ dons|length }}</h3>
+    </div>
+  </div>
+</div>
+
+<!-- Liens rapides -->
+<div class="d-flex gap-2 mb-4 flex-wrap">
+  <a href="{% url 'liste_demandes' %}" class="btn btn-danger">Voir les appels urgents</a>
+  <a href="{% url 'enregistrer_don' %}" class="btn btn-outline-danger">Enregistrer un don</a>
+  <a href="{% url 'liste_campagnes' %}" class="btn btn-outline-secondary">Voir les campagnes</a>
+  <a href="{% url 'historique_dons' %}" class="btn btn-outline-secondary">Mon historique</a>
+</div>
+
+<!-- Demandes urgentes compatibles -->
+<div class="card shadow-sm mb-4">
+  <div class="card-header bg-danger text-white">
+    <h5 class="mb-0">Appels urgents compatibles avec votre groupe {{ donneur.groupe_sanguin }}</h5>
+  </div>
+  <div class="card-body p-0">
+    {% if demandes %}
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr><th>Hôpital</th><th>Groupe</th><th>Quantité</th><th>Délai</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        {% for d in demandes %}
+        <tr>
+          <td>{{ d.hopital.nom }}</td>
+          <td><span class="badge bg-danger">{{ d.groupe_sanguin }}</span></td>
+          <td>{{ d.quantite }} poches</td>
+          <td>{{ d.delai|date:"d/m/Y" }}</td>
+          <td>
+            <a href="{% url 'repondre_demande' d.id %}" class="btn btn-sm btn-danger">Répondre</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted text-center py-3">Aucun appel urgent compatible en ce moment.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Derniers dons -->
+<div class="card shadow-sm">
+  <div class="card-header bg-light">
+    <h5 class="mb-0">Mes derniers dons</h5>
+  </div>
+  <div class="card-body p-0">
+    {% if dons %}
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr><th>Date</th><th>Hôpital</th><th>Statut</th></tr>
+      </thead>
+      <tbody>
+        {% for don in dons %}
+        <tr>
+          <td>{{ don.date_don|date:"d/m/Y" }}</td>
+          <td>{{ don.hopital.nom }}</td>
+          <td>
+            {% if don.valide %}
+              <span class="badge bg-success">Validé</span>
+            {% else %}
+              <span class="badge bg-secondary">En attente</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted text-center py-3">Aucun don enregistré pour l'instant.</p>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

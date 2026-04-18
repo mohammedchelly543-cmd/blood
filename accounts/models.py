@@ -8,6 +8,19 @@ GROUPES_SANGUINS = [
     ('O+', 'O+'), ('O-', 'O-'),
 ]
 
+# ✅ AJOUT IMPORTANT
+COMPATIBILITE = {
+    'O-': ['O-','O+','A-','A+','B-','B+','AB-','AB+'],
+    'O+': ['O+','A+','B+','AB+'],
+    'A-': ['A-','A+','AB-','AB+'],
+    'A+': ['A+','AB+'],
+    'B-': ['B-','B+','AB-','AB+'],
+    'B+': ['B+','AB+'],
+    'AB-': ['AB-','AB+'],
+    'AB+': ['AB+'],
+}
+
+
 class Donneur(models.Model):
     SEXE_CHOICES = [('M', 'Homme'), ('F', 'Femme')]
 
@@ -26,14 +39,18 @@ class Donneur(models.Model):
     def prochain_don(self):
         from donations.models import Don
         from datetime import timedelta
-        dernier = Don.objects.filter(donneur=self, valide=True).order_by('-date_don').first()
+
+        dernier = Don.objects.filter(donneur=self, valide=True)\
+                             .order_by('-date_don').first()
         if not dernier:
             return None
+
         jours = 56 if self.sexe == 'M' else 84
         return dernier.date_don + timedelta(days=jours)
 
     def est_eligible(self):
         from datetime import date
+
         prochain = self.prochain_don()
         if not prochain:
             return True

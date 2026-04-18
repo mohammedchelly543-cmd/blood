@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Inscription Donneur{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h3 class="text-danger mb-4">Inscription — Donneur</h3>
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Prénom</label>
+              <input type="text" name="first_name" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Nom</label>
+              <input type="text" name="last_name" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Nom d'utilisateur</label>
+              <input type="text" name="username" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Groupe sanguin</label>
+              <select name="groupe_sanguin" class="form-select" required>
+                {% for val, label in form.groupe_sanguin.field.choices %}
+                  <option value="{{ val }}">{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Sexe</label>
+              <select name="sexe" class="form-select" required>
+                <option value="M">Homme</option>
+                <option value="F">Femme</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Date de naissance</label>
+              <input type="date" name="date_naissance" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Ville</label>
+              <input type="text" name="ville" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Téléphone</label>
+              <input type="text" name="telephone" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Mot de passe</label>
+              <input type="password" name="password1" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Confirmer le mot de passe</label>
+              <input type="password" name="password2" class="form-control" required>
+            </div>
+          </div>
+          {% if form.errors %}
+            <div class="alert alert-danger mt-3">
+              {% for field in form %}{% for error in field.errors %}<p class="mb-0">{{ error }}</p>{% endfor %}{% endfor %}
+              {% for error in form.non_field_errors %}<p class="mb-0">{{ error }}</p>{% endfor %}
+            </div>
+          {% endif %}
+          <button type="submit" class="btn btn-danger w-100 mt-3">S'inscrire</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

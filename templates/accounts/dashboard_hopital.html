@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard Hôpital{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="text-danger">{{ hopital.nom }}</h2>
+  <div class="d-flex gap-2">
+    <a href="{% url 'creer_demande' %}" class="btn btn-danger">+ Nouvelle demande</a>
+    <a href="{% url 'creer_campagne' %}" class="btn btn-outline-danger">+ Nouvelle campagne</a>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm text-center py-3">
+      <div style="font-size:2rem;">🚨</div>
+      <h3 class="fw-bold text-danger">{{ demandes.count }}</h3>
+      <p class="text-muted mb-0">Demandes publiées</p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm text-center py-3">
+      <div style="font-size:2rem;">📅</div>
+      <h3 class="fw-bold text-danger">{{ campagnes.count }}</h3>
+      <p class="text-muted mb-0">Campagnes créées</p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm text-center py-3">
+      <div style="font-size:2rem;">✅</div>
+      <h3 class="fw-bold text-success">
+        {{ demandes|length }}
+      </h3>
+      <p class="text-muted mb-0">Demandes actives</p>
+    </div>
+  </div>
+</div>
+
+<!-- Demandes urgentes -->
+<div class="card shadow-sm mb-4">
+  <div class="card-header bg-danger text-white d-flex justify-content-between">
+    <h5 class="mb-0">Mes demandes urgentes</h5>
+    <a href="{% url 'creer_demande' %}" class="btn btn-light btn-sm">+ Ajouter</a>
+  </div>
+  <div class="card-body p-0">
+    {% if demandes %}
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr><th>Groupe</th><th>Quantité</th><th>Délai</th><th>Statut</th><th>Réponses</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for d in demandes %}
+        <tr>
+          <td><span class="badge bg-danger">{{ d.groupe_sanguin }}</span></td>
+          <td>{{ d.quantite }} poches</td>
+          <td>{{ d.delai|date:"d/m/Y" }}</td>
+          <td>
+            {% if d.statut == 'active' %}
+              <span class="badge bg-success">Active</span>
+            {% elif d.statut == 'cloturee' %}
+              <span class="badge bg-secondary">Clôturée</span>
+            {% else %}
+              <span class="badge bg-info">Satisfaite</span>
+            {% endif %}
+          </td>
+          <td>{{ d.nb_reponses }}</td>
+          <td>
+            <a href="{% url 'modifier_demande' d.id %}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+            <a href="{% url 'cloturer_demande' d.id %}" class="btn btn-sm btn-outline-danger">Clôturer</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted text-center py-3">Aucune demande publiée.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Campagnes -->
+<div class="card shadow-sm">
+  <div class="card-header bg-light d-flex justify-content-between">
+    <h5 class="mb-0">Mes campagnes de collecte</h5>
+    <a href="{% url 'creer_campagne' %}" class="btn btn-danger btn-sm">+ Ajouter</a>
+  </div>
+  <div class="card-body p-0">
+    {% if campagnes %}
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr><th>Nom</th><th>Date</th><th>Lieu</th><th>Places</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for c in campagnes %}
+        <tr>
+          <td>{{ c.nom }}</td>
+          <td>{{ c.date|date:"d/m/Y" }}</td>
+          <td>{{ c.lieu }}</td>
+          <td>
+            {% if c.est_complete %}
+              <span class="badge bg-danger">Complet</span>
+            {% else %}
+              <span class="badge bg-success">{{ c.places_restantes }} places</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{% url 'detail_campagne' c.id %}" class="btn btn-sm btn-outline-secondary">Voir</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted text-center py-3">Aucune campagne créée.</p>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
