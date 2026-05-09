@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Nouvelle campagne — BloodConnect{% endblock %}
+
+{% block content %}
+<div class="page-header fade-up">
+  <div>
+    <h1><i class="bi bi-calendar-plus-fill" style="color:var(--red)"></i> Nouvelle campagne de don</h1>
+    <p>Organisez une collecte et permettez aux donneurs de s'inscrire en ligne.</p>
+  </div>
+  <a href="{% url 'dashboard_hopital' %}" class="btn btn-ghost">
+    <i class="bi bi-arrow-left"></i> Retour
+  </a>
+</div>
+
+<div class="fade-up-2" style="max-width:600px;">
+  <div class="card">
+    <div class="card-header" style="background:var(--red);color:white;border-color:var(--red-dark);">
+      <span><i class="bi bi-calendar-event"></i> Informations de la campagne</span>
+    </div>
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="bc-alert danger">
+            <i class="bi bi-x-circle"></i>
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        <div class="form-group">
+          <label class="form-label">Nom de la campagne</label>
+          <input type="text" name="{{ form.nom.html_name }}"
+                 value="{{ form.nom.value|default:'' }}"
+                 class="form-control" placeholder="Ex : Collecte de printemps 2026">
+          {% if form.nom.errors %}<div class="form-error">{{ form.nom.errors }}</div>{% endif %}
+        </div>
+
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input type="date" name="{{ form.date.html_name }}"
+                   value="{{ form.date.value|default:'' }}"
+                   class="form-control">
+            {% if form.date.errors %}<div class="form-error">{{ form.date.errors }}</div>{% endif %}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Capacité totale</label>
+            <input type="number" name="{{ form.capacite_totale.html_name }}"
+                   value="{{ form.capacite_totale.value|default:'' }}"
+                   class="form-control" min="1" placeholder="Ex : 50">
+            {% if form.capacite_totale.errors %}<div class="form-error">{{ form.capacite_totale.errors }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Lieu</label>
+          <input type="text" name="{{ form.lieu.html_name }}"
+                 value="{{ form.lieu.value|default:'' }}"
+                 class="form-control" placeholder="Ex : Salle polyvalente, Rue de la République">
+          {% if form.lieu.errors %}<div class="form-error">{{ form.lieu.errors }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Groupes sanguins ciblés</label>
+          <input type="text" name="{{ form.groupes_cibles.html_name }}"
+                 value="{{ form.groupes_cibles.value|default:'' }}"
+                 class="form-control" placeholder="Ex : A+, O-, B+  (laisser vide = tous)">
+          {% if form.groupes_cibles.errors %}<div class="form-error">{{ form.groupes_cibles.errors }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description <span style="color:var(--ink-light);font-weight:400">(optionnel)</span></label>
+          <textarea name="{{ form.description.html_name }}"
+                    class="form-control" rows="3"
+                    placeholder="Informations complémentaires, conditions d'accès…">{{ form.description.value|default:'' }}</textarea>
+          {% if form.description.errors %}<div class="form-error">{{ form.description.errors }}</div>{% endif %}
+        </div>
+
+        <div style="display:flex;gap:.75rem;margin-top:1.5rem;">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-calendar-check"></i> Créer la campagne
+          </button>
+          <a href="{% url 'dashboard_hopital' %}" class="btn btn-ghost">Annuler</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

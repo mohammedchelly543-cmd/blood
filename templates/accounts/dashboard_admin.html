@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard Admin — BloodConnect{% endblock %}
+
+{% block extra_css %}
+<style>
+  .admin-header {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem; margin-bottom: 1.75rem;
+  }
+  .admin-header h1 {
+    font-family: var(--font-display); font-size: 1.7rem; font-weight: 800;
+  }
+  .admin-header p { color: var(--ink-light); font-size: .88rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="admin-header fade-up">
+  <div>
+    <h1>Tableau de bord <span style="color:var(--red);">Admin</span></h1>
+    <p>Vue d'ensemble de la plateforme BloodConnect</p>
+  </div>
+  <a href="{% url 'export_donneurs_csv' %}" class="btn btn-ghost btn-sm">
+    <i class="bi bi-download"></i> Exporter donneurs CSV
+  </a>
+</div>
+
+<!-- Stats -->
+<div class="grid grid-4 fade-up-2" style="margin-bottom:1.75rem;">
+  <div class="stat-card">
+    <div class="stat-icon" style="background:#E8F0FE; color:#1967D2;"><i class="bi bi-people-fill"></i></div>
+    <div class="stat-num" style="color:#1967D2;">{{ nb_donneurs }}</div>
+    <div class="stat-label">Donneurs actifs</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:#E6F9EF; color:var(--success);"><i class="bi bi-hospital-fill"></i></div>
+    <div class="stat-num" style="color:var(--success);">{{ nb_hopitaux }}</div>
+    <div class="stat-label">Hôpitaux validés</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:var(--red-soft); color:var(--red);"><i class="bi bi-droplet-fill"></i></div>
+    <div class="stat-num" style="color:var(--red);">{{ nb_dons }}</div>
+    <div class="stat-label">Dons enregistrés</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:#FFF8E6; color:var(--warning);"><i class="bi bi-hourglass-split"></i></div>
+    <div class="stat-num" style="color:var(--warning);">{{ nb_hopitaux_attente }}</div>
+    <div class="stat-label">En attente de validation</div>
+  </div>
+</div>
+
+<!-- Pending hospitals -->
+{% if hopitaux_attente %}
+<div class="card fade-up-3" style="margin-bottom:1.5rem;">
+  <div class="card-header warning">
+    <span><i class="bi bi-hourglass-split me-2"></i>Hôpitaux en attente de validation</span>
+  </div>
+  <table class="bc-table">
+    <thead>
+      <tr><th>Établissement</th><th>Ville</th><th>N° Agrément</th><th>Inscrit le</th><th>Action</th></tr>
+    </thead>
+    <tbody>
+      {% for h in hopitaux_attente %}
+      <tr>
+        <td style="font-weight:600;">{{ h.nom }}</td>
+        <td>{{ h.ville }}</td>
+        <td><code style="font-size:.8rem; background:var(--bg); padding:.15rem .4rem; border-radius:4px;">{{ h.numero_agrement }}</code></td>
+        <td>{{ h.date_inscription|date:"d/m/Y" }}</td>
+        <td>
+          <a href="{% url 'valider_hopital' h.id %}" class="btn btn-sm" style="background:var(--success); color:white;">
+            <i class="bi bi-check-lg"></i> Valider
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- Active urgent requests -->
+<div class="card fade-up-4">
+  <div class="card-header danger">
+    <span><i class="bi bi-exclamation-triangle-fill me-2"></i>Demandes urgentes actives</span>
+  </div>
+  {% if demandes_actives %}
+  <table class="bc-table">
+    <thead>
+      <tr><th>Hôpital</th><th>Groupe</th><th>Quantité</th><th>Délai</th><th>Réponses</th></tr>
+    </thead>
+    <tbody>
+      {% for d in demandes_actives %}
+      <tr>
+        <td style="font-weight:600;">{{ d.hopital.nom }}</td>
+        <td><span class="badge badge-red">{{ d.groupe_sanguin }}</span></td>
+        <td>{{ d.quantite }} poche{% if d.quantite != 1 %}s{% endif %}</td>
+        <td>{{ d.delai|date:"d/m/Y" }}</td>
+        <td>
+          <span class="badge {% if d.nb_reponses > 0 %}badge-green{% else %}badge-gray{% endif %}">
+            {{ d.nb_reponses }} réponse{% if d.nb_reponses != 1 %}s{% endif %}
+          </span>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    <i class="bi bi-check-circle"></i>
+    <p>Aucune demande urgente active.</p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

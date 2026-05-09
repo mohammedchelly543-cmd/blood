@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard Hôpital — BloodConnect{% endblock %}
+
+{% block content %}
+
+<div class="page-header fade-up">
+  <div>
+    <h1>{{ hopital.nom }}</h1>
+    <p><i class="bi bi-geo-alt me-1"></i>{{ hopital.ville }}
+      {% if not hopital.valide %}
+        <span class="badge badge-warn" style="margin-left:.5rem;"><i class="bi bi-clock me-1"></i>En attente de validation</span>
+      {% else %}
+        <span class="badge badge-green" style="margin-left:.5rem;"><i class="bi bi-check-circle me-1"></i>Validé</span>
+      {% endif %}
+    </p>
+  </div>
+  <div style="display:flex; gap:.6rem; flex-wrap:wrap;">
+    <a href="{% url 'creer_demande' %}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Nouvelle demande</a>
+    <a href="{% url 'creer_campagne' %}" class="btn btn-ghost"><i class="bi bi-calendar-plus"></i> Nouvelle campagne</a>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="grid grid-3 fade-up-2" style="margin-bottom:1.75rem;">
+  <div class="stat-card">
+    <div class="stat-icon" style="background:var(--red-soft); color:var(--red);"><i class="bi bi-exclamation-circle-fill"></i></div>
+    <div class="stat-num" style="color:var(--red);">{{ demandes.count }}</div>
+    <div class="stat-label">Demandes publiées</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:#E8F0FE; color:#1967D2;"><i class="bi bi-calendar-event-fill"></i></div>
+    <div class="stat-num" style="color:#1967D2;">{{ campagnes.count }}</div>
+    <div class="stat-label">Campagnes créées</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:#E6F9EF; color:var(--success);"><i class="bi bi-droplet-fill"></i></div>
+    <div class="stat-num" style="color:var(--success);">
+      {% with active=demandes|length %}{{ active }}{% endwith %}
+    </div>
+    <div class="stat-label">Demandes totales</div>
+  </div>
+</div>
+
+<!-- Urgent requests -->
+<div class="card fade-up-3" style="margin-bottom:1.5rem;">
+  <div class="card-header danger">
+    <span><i class="bi bi-exclamation-triangle-fill me-2"></i>Mes demandes urgentes</span>
+    <a href="{% url 'creer_demande' %}" class="btn btn-sm" style="background:rgba(255,255,255,.2); color:white; border:1px solid rgba(255,255,255,.3);">
+      <i class="bi bi-plus"></i> Ajouter
+    </a>
+  </div>
+  {% if demandes %}
+  <table class="bc-table">
+    <thead>
+      <tr><th>Groupe</th><th>Quantité</th><th>Délai</th><th>Statut</th><th>Réponses</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for d in demandes %}
+      <tr>
+        <td><span class="badge badge-red">{{ d.groupe_sanguin }}</span></td>
+        <td>{{ d.quantite }} poche{% if d.quantite != 1 %}s{% endif %}</td>
+        <td>{{ d.delai|date:"d/m/Y" }}</td>
+        <td>
+          {% if d.statut == 'active' %}
+            <span class="badge badge-green">Active</span>
+          {% elif d.statut == 'cloturee' %}
+            <span class="badge badge-gray">Clôturée</span>
+          {% else %}
+            <span class="badge badge-blue">Satisfaite</span>
+          {% endif %}
+        </td>
+        <td><span class="badge {% if d.nb_reponses > 0 %}badge-green{% else %}badge-gray{% endif %}">{{ d.nb_reponses }}</span></td>
+        <td style="display:flex; gap:.4rem;">
+          <a href="{% url 'modifier_demande' d.id %}" class="btn btn-ghost btn-sm">Modifier</a>
+          <a href="{% url 'cloturer_demande' d.id %}" class="btn btn-sm" style="background:var(--red-soft); color:var(--red);">Clôturer</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    <i class="bi bi-exclamation-circle"></i>
+    <p>Aucune demande publiée. <a href="{% url 'creer_demande' %}" style="color:var(--red);">Créer une demande</a></p>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Campaigns -->
+<div class="card fade-up-4">
+  <div class="card-header">
+    <span><i class="bi bi-calendar-event me-2"></i>Mes campagnes de collecte</span>
+    <a href="{% url 'creer_campagne' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> Ajouter</a>
+  </div>
+  {% if campagnes %}
+  <table class="bc-table">
+    <thead>
+      <tr><th>Nom</th><th>Date</th><th>Lieu</th><th>Places</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for c in campagnes %}
+      <tr>
+        <td style="font-weight:600;">{{ c.nom }}</td>
+        <td>{{ c.date|date:"d/m/Y" }}</td>
+        <td>{{ c.lieu }}</td>
+        <td>
+          {% if c.est_complete %}
+            <span class="badge badge-red">Complet</span>
+          {% else %}
+            <span class="badge badge-green">{{ c.places_restantes }} place{% if c.places_restantes != 1 %}s{% endif %}</span>
+          {% endif %}
+        </td>
+        <td>
+          <a href="{% url 'detail_campagne' c.id %}" class="btn btn-ghost btn-sm">
+            <i class="bi bi-eye"></i> Voir
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    <i class="bi bi-calendar-x"></i>
+    <p>Aucune campagne créée. <a href="{% url 'creer_campagne' %}" style="color:var(--red);">Créer une campagne</a></p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
