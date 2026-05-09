@@ -11,11 +11,11 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 
-# Railway injecte RAILWAY_STATIC_URL — on accepte aussi l'hôte Railway automatiquement
-RAILWAY_STATIC_URL = os.environ.get('RAILWAY_STATIC_URL', '')
-
-# Fallback automatique qui couvre tous les domaines *.railway.app
-CSRF_TRUSTED_ORIGINS = ['https://*.railway.app', ...]
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.railway.app',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
 
 # ─── Applications ─────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
@@ -32,7 +32,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',   # ← Whitenoise pour les statics
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -62,7 +62,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'bloodconnect.wsgi.application'
 
 # ─── Base de données ──────────────────────────────────────────────────────────
-# Railway fournit DATABASE_URL pour PostgreSQL
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
 
 if DATABASE_URL:
