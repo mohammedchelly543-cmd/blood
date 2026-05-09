@@ -14,9 +14,8 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 # Railway injecte RAILWAY_STATIC_URL — on accepte aussi l'hôte Railway automatiquement
 RAILWAY_STATIC_URL = os.environ.get('RAILWAY_STATIC_URL', '')
 
-CSRF_TRUSTED_ORIGINS = [
-    f"https://{h}" for h in ALLOWED_HOSTS if h != '*'
-]
+# Fallback automatique qui couvre tous les domaines *.railway.app
+CSRF_TRUSTED_ORIGINS = ['https://*.railway.app', ...]
 
 # ─── Applications ─────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
