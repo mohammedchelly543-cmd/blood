@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load custom_tags %}
+{% block title %}{{ campagne.nom }} — BloodConnect{% endblock %}
+
+{% block content %}
+<div class="page-header fade-up">
+  <div>
+    <h1><i class="bi bi-calendar-event-fill" style="color:var(--red)"></i> {{ campagne.nom }}</h1>
+    <p>Organisée par <strong>{{ campagne.hopital.nom }}</strong> · {{ campagne.date|date:"d/m/Y" }}</p>
+  </div>
+  <a href="{% url 'liste_campagnes' %}" class="btn btn-ghost">
+    <i class="bi bi-arrow-left"></i> Retour aux campagnes
+  </a>
+</div>
+
+<div class="grid grid-2 fade-up-2" style="margin-bottom:1.5rem;">
+
+  <!-- Infos campagne -->
+  <div class="card">
+    <div class="card-header">
+      <span><i class="bi bi-info-circle"></i> Détails</span>
+      {% if campagne.est_complete %}
+        <span class="badge badge-gray">Complet</span>
+      {% else %}
+        <span class="badge badge-green">{{ campagne.places_restantes }} place{{ campagne.places_restantes|pluralize }} restante{{ campagne.places_restantes|pluralize }}</span>
+      {% endif %}
+    </div>
+    <div class="card-body">
+      <table class="bc-table">
+        <tr>
+          <td style="color:var(--ink-light);width:40%"><i class="bi bi-geo-alt"></i> Lieu</td>
+          <td>{{ campagne.lieu }}</td>
+        </tr>
+        <tr>
+          <td style="color:var(--ink-light)"><i class="bi bi-calendar"></i> Date</td>
+          <td>{{ campagne.date|date:"l d F Y" }}</td>
+        </tr>
+        <tr>
+          <td style="color:var(--ink-light)"><i class="bi bi-people"></i> Capacité</td>
+          <td>{{ campagne.inscriptions.count }} / {{ campagne.capacite_totale }}</td>
+        </tr>
+        <tr>
+          <td style="color:var(--ink-light)"><i class="bi bi-droplet"></i> Groupes ciblés</td>
+          <td>
+            {% if campagne.groupes_cibles %}
+              {% for g in campagne.groupes_cibles.split %}
+                <span class="badge badge-red">{{ g|cut:"," }}</span>
+              {% endfor %}
+            {% else %}
+              <span class="badge badge-gray">Tous groupes</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% if campagne.description %}
+        <tr>
+          <td style="color:var(--ink-light)"><i class="bi bi-chat-text"></i> Description</td>
+          <td>{{ campagne.description }}</td>
+        </tr>
+        {% endif %}
+      </table>
+    </div>
+  </div>
+
+  <!-- Inscription donneur -->
+  {% if user.is_authenticated and user|has_attr:"donneur" %}
+  <div class="card">
+    <div class="card-header {% if not campagne.est_complete %}danger{% endif %}">
+      <span><i class="bi bi-heart-fill"></i> S'inscrire à cette campagne</span>
+    </div>
+    <div class="card-body">
+      {% if campagne.est_complete %}
+        <div class="bc-alert warning">
+          <i class="bi bi-exclamation-triangle"></i>
+          Cette campagne est complète. Revenez plus tard.
+        </div>
+      {% else %}
+        <form method="post" action="{% url 'inscrire_campagne' campagne.pk %}">
+          {% csrf_token %}
+          <div class="form-group">
+            <label class="form-label">Choisissez votre créneau horaire</label>
+            <input type="time" name="creneau_horaire" class="form-control" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%">
+            <i class="bi bi-calendar-check"></i> Confirmer mon inscription
+          </button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+<!-- Liste des inscrits (visible hopital/admin) -->
+{% if user.is_authenticated %}
+{% if user.is_staff or user|has_attr:"hopital" %}
+<div class="card fade-up-3">
+  <div class="card-header">
+    <span><i class="bi bi-people-fill"></i> Donneurs inscrits ({{ inscriptions.count }})</span>
+  </div>
+  <div class="card-body" style="padding:0;">
+    {% if inscriptions %}
+    <table class="bc-table">
+      <thead>
+        <tr>
+          <th>Donneur</th>
+          <th>Groupe sanguin</th>
+          <th>Créneau</th>
+          <th>Présent</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ins in inscriptions %}
+        <tr>
+          <td>{{ ins.donneur.user.get_full_name }}</td>
+          <td><span class="badge badge-red">{{ ins.donneur.groupe_sanguin }}</span></td>
+          <td>{{ ins.creneau_horaire|time:"H:i" }}</td>
+          <td>
+            {% if ins.present %}
+              <span class="badge badge-green"><i class="bi bi-check"></i> Oui</span>
+            {% else %}
+              <span class="badge badge-gray">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <i class="bi bi-people"></i>
+      <p>Aucun donneur inscrit pour le moment.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endif %}
+
+{% endblock %}

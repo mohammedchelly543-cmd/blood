@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}Mon historique de dons — BloodConnect{% endblock %}
+
+{% block content %}
+
+<div class="page-header fade-up">
+  <div>
+    <h1>Mon historique de dons</h1>
+    <p>Tous vos dons de sang enregistrés sur BloodConnect.</p>
+  </div>
+  <div style="display:flex; gap:.6rem;">
+    <a href="{% url 'enregistrer_don' %}" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Enregistrer un don
+    </a>
+    <a href="{% url 'dashboard_donneur' %}" class="btn btn-ghost">
+      <i class="bi bi-arrow-left"></i> Retour
+    </a>
+  </div>
+</div>
+
+<div class="card fade-up-2">
+  <div class="card-header">
+    <span><i class="bi bi-clock-history me-2"></i>Historique complet</span>
+    <span class="badge badge-red">{{ dons|length }} don{% if dons|length != 1 %}s{% endif %}</span>
+  </div>
+
+  {% if dons %}
+  <table class="bc-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Hôpital</th>
+        <th>Notes</th>
+        <th>Statut</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for don in dons %}
+      <tr>
+        <td style="font-weight:600;">{{ don.date_don|date:"d/m/Y" }}</td>
+        <td>{{ don.hopital.nom }}</td>
+        <td style="color:var(--ink-mid); font-size:.88rem;">
+          {% if don.notes %}{{ don.notes }}{% else %}—{% endif %}
+        </td>
+        <td>
+          {% if don.valide %}
+            <span class="badge badge-green"><i class="bi bi-check-circle-fill me-1"></i>Validé</span>
+          {% else %}
+            <span class="badge badge-gray"><i class="bi bi-clock me-1"></i>En attente</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state" style="padding:4rem 1rem;">
+    <i class="bi bi-droplet" style="color:var(--ink-light);"></i>
+    <p style="font-size:1rem; font-weight:600;">Aucun don enregistré.</p>
+    <p style="font-size:.85rem; margin-top:.25rem;">
+      <a href="{% url 'enregistrer_don' %}" style="color:var(--red);">Enregistrez votre premier don</a>
+    </p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

@@ -54,9 +54,10 @@ def modifier_demande(request, pk):
 @hopital_required
 def cloturer_demande(request, pk):
     demande = get_object_or_404(DemandeUrgente, pk=pk, hopital=request.user.hopital)
-    demande.statut = 'cloturee'
-    demande.save()
-    messages.success(request, 'Demande clôturée.')
+    if request.method == 'POST':
+        demande.statut = 'cloturee'
+        demande.save()
+        messages.success(request, 'Demande clôturée.')
     return redirect('dashboard_hopital')
 
 
@@ -64,8 +65,8 @@ def cloturer_demande(request, pk):
 def repondre_demande(request, pk):
     demande = get_object_or_404(DemandeUrgente, pk=pk, statut='active')
     donneur = request.user.donneur
-    if not donneur.est_eligible():
-        messages.warning(request, f'Vous ne pouvez pas donner avant le {donneur.prochain_don().strftime("%d/%m/%Y")}.')
+    if not donneur.est_eligible:
+        messages.warning(request, f'Vous ne pouvez pas donner avant le {donneur.prochain_don.strftime("%d/%m/%Y")}.')
         return redirect('liste_demandes')
     _, created = ReponseAppel.objects.get_or_create(demande=demande, donneur=donneur)
     if created:

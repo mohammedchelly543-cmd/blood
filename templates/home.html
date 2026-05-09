@@ -1,90 +1,134 @@
 {% extends 'base.html' %}
-{% block title %}BloodConnect — ISET Sfax{% endblock %}
+{% block title %}BloodConnect — Don de sang{% endblock %}
+
+{% block extra_css %}
+<style>
+  .hero {
+    background: linear-gradient(135deg, var(--red) 0%, #8B0F0B 100%);
+    border-radius: var(--radius-lg);
+    padding: 5rem 3rem;
+    text-align: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 3rem;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: rgba(255,255,255,.15); color: rgba(255,255,255,.9);
+    font-size: .78rem; font-weight: 600; padding: .3rem .85rem;
+    border-radius: 999px; border: 1px solid rgba(255,255,255,.25);
+    margin-bottom: 1.25rem; letter-spacing: .04em;
+  }
+  .hero h1 {
+    font-family: var(--font-display); font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 800; line-height: 1.1; margin-bottom: 1rem;
+  }
+  .hero p {
+    font-size: 1.1rem; opacity: .85; max-width: 520px; margin: 0 auto 2rem;
+  }
+  .hero-ctas { display: flex; justify-content: center; gap: .75rem; flex-wrap: wrap; }
+  .btn-white {
+    background: white; color: var(--red); font-weight: 700;
+    border-radius: 10px; padding: .75rem 1.6rem; font-size: .95rem;
+    text-decoration: none; transition: all .15s; display: inline-flex; align-items: center; gap: .4rem;
+  }
+  .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.2); color: var(--red-dark); }
+  .btn-outline-white {
+    background: transparent; color: white; font-weight: 600;
+    border: 1.5px solid rgba(255,255,255,.5); border-radius: 10px;
+    padding: .75rem 1.6rem; font-size: .95rem;
+    text-decoration: none; transition: all .15s; display: inline-flex; align-items: center; gap: .4rem;
+  }
+  .btn-outline-white:hover { background: rgba(255,255,255,.15); color: white; }
+
+  .feature-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 1.75rem;
+    text-decoration: none; color: inherit;
+    transition: all .2s; display: block;
+  }
+  .feature-card:hover { border-color: var(--red); transform: translateY(-4px); box-shadow: var(--shadow); }
+  .feature-card .icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: var(--red-soft); color: var(--red);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 1rem;
+  }
+  .feature-card h3 {
+    font-family: var(--font-display); font-size: 1.1rem; font-weight: 700;
+    margin-bottom: .5rem;
+  }
+  .feature-card p { font-size: .88rem; color: var(--ink-light); }
+
+  .compat-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+  .compat-table th, .compat-table td {
+    padding: .65rem .8rem; border: 1px solid var(--border); text-align: center;
+  }
+  .compat-table th { background: var(--bg); font-weight: 700; font-size: .75rem; }
+  .compat-table td:first-child { font-weight: 700; background: var(--bg); }
+  .compat-check { color: var(--success); font-size: 1rem; }
+  .compat-no { color: var(--border); }
+
+  .section-title {
+    font-family: var(--font-display); font-size: 1.4rem; font-weight: 800;
+    margin-bottom: 1.25rem;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 
 <!-- Hero -->
-<div class="py-5 mb-4" style="background: linear-gradient(135deg, #c0392b 0%, #922b21 100%); border-radius: 16px;">
-  <div class="container text-white text-center py-3">
-
-    <!-- Logo ISET Sfax -->
-    <div class="mb-3">
-      <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white mb-3"
-           style="width:80px;height:80px;">
-        <span style="font-size:2rem;">🏛️</span>
-      </div>
-      <div class="small opacity-75 mb-1">ISET Sfax — Département Informatique</div>
-      <div class="small opacity-75 mb-3">Développement Web Django · 2025–2026</div>
-    </div>
-
-    <!-- Titre principal -->
-    <div class="d-flex align-items-center justify-content-center gap-3 mb-3">
-      <div style="width:48px;height:48px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="#c0392b">
-          <path d="M12 2C8 8 4 11 4 15a8 8 0 0016 0c0-4-4-7-8-13z"/>
-        </svg>
-      </div>
-      <h1 class="display-4 fw-bold mb-0">BloodConnect</h1>
-    </div>
-    <p class="lead opacity-90 mb-4">
-      Plateforme intelligente de gestion du don de sang.<br>
-      Connecter les donneurs aux hôpitaux qui en ont besoin.
-    </p>
-
-    <!-- Boutons -->
-    <div class="d-flex justify-content-center gap-3 flex-wrap">
-      <a href="{% url 'register_donneur' %}" class="btn btn-light btn-lg px-4 fw-bold" style="color:#c0392b;">
-        Je veux donner mon sang
-      </a>
-      <a href="{% url 'register_hopital' %}" class="btn btn-outline-light btn-lg px-4">
-        Mon établissement a besoin
-      </a>
-      <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg px-4">
-        Se connecter
-      </a>
-    </div>
+<div class="hero fade-up">
+  <div class="hero-badge">🏛️ ISET Sfax · Département Informatique</div>
+  <h1>Chaque don compte.<br>Connectons-nous.</h1>
+  <p>Plateforme intelligente de gestion du don de sang. Donneurs, hôpitaux, campagnes — tout en un.</p>
+  <div class="hero-ctas">
+    <a href="{% url 'register_donneur' %}" class="btn-white">
+      <i class="bi bi-heart-fill"></i> Je veux donner
+    </a>
+    <a href="{% url 'liste_demandes' %}" class="btn-outline-white">
+      <i class="bi bi-exclamation-circle"></i> Voir les appels urgents
+    </a>
+    <a href="{% url 'login' %}" class="btn-outline-white">
+      Se connecter
+    </a>
   </div>
 </div>
 
-<!-- Stats -->
-<div class="row text-center g-3 mb-5">
-  <div class="col-md-4">
-    <div class="card border-0 shadow-sm h-100">
-      <div class="card-body py-4">
-        <div style="font-size:2.5rem;">🩸</div>
-        <h3 class="fw-bold text-danger mt-2">Don de sang</h3>
-        <p class="text-muted">Enregistrez vos dons et suivez votre historique en temps réel</p>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card border-0 shadow-sm h-100">
-      <div class="card-body py-4">
-        <div style="font-size:2.5rem;">🏥</div>
-        <h3 class="fw-bold text-danger mt-2">Demandes urgentes</h3>
-        <p class="text-muted">Les hôpitaux publient leurs besoins urgents filtrés par groupe sanguin</p>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card border-0 shadow-sm h-100">
-      <div class="card-body py-4">
-        <div style="font-size:2.5rem;">📅</div>
-        <h3 class="fw-bold text-danger mt-2">Campagnes</h3>
-        <p class="text-muted">Inscrivez-vous aux campagnes de collecte organisées près de chez vous</p>
-      </div>
-    </div>
-  </div>
+<!-- Features -->
+<div class="grid grid-3 fade-up-2" style="margin-bottom:3rem;">
+  <a href="{% url 'register_donneur' %}" class="feature-card">
+    <div class="icon"><i class="bi bi-droplet-fill"></i></div>
+    <h3>Don de sang</h3>
+    <p>Enregistrez vos dons, suivez votre éligibilité et votre historique en temps réel.</p>
+  </a>
+  <a href="{% url 'liste_demandes' %}" class="feature-card">
+    <div class="icon"><i class="bi bi-hospital"></i></div>
+    <h3>Appels urgents</h3>
+    <p>Les hôpitaux publient leurs besoins filtrés par groupe sanguin. Répondez en un clic.</p>
+  </a>
+  <a href="{% url 'liste_campagnes' %}" class="feature-card">
+    <div class="icon"><i class="bi bi-calendar-check"></i></div>
+    <h3>Campagnes</h3>
+    <p>Inscrivez-vous aux collectes organisées près de chez vous et choisissez votre créneau.</p>
+  </a>
 </div>
 
-<!-- Tableau de compatibilité -->
-<div class="card border-0 shadow-sm mb-5">
-  <div class="card-header bg-danger text-white">
-    <h5 class="mb-0">Tableau de compatibilité des groupes sanguins</h5>
-  </div>
-  <div class="card-body p-0">
-    <div class="table-responsive">
-      <table class="table table-bordered table-hover mb-0 text-center">
-        <thead class="table-light">
+<!-- Compatibility table -->
+<div class="fade-up-3" style="margin-bottom:3rem;">
+  <h2 class="section-title">Compatibilité des groupes sanguins</h2>
+  <div class="card">
+    <div class="card-body" style="padding:0; overflow-x:auto;">
+      <table class="compat-table">
+        <thead>
           <tr>
             <th>Donneur \ Receveur</th>
             <th>O−</th><th>O+</th><th>A−</th><th>A+</th>
@@ -94,9 +138,15 @@
         <tbody>
           {% for row in compatibilite %}
           <tr>
-            <td class="fw-bold bg-light">{{ row.donneur }}</td>
+            <td>{{ row.donneur }}</td>
             {% for ok in row.receveurs %}
-              <td>{% if ok %}<span class="text-success fw-bold">✓</span>{% else %}<span class="text-muted">–</span>{% endif %}</td>
+              <td>
+                {% if ok %}
+                  <span class="compat-check">✓</span>
+                {% else %}
+                  <span class="compat-no">—</span>
+                {% endif %}
+              </td>
             {% endfor %}
           </tr>
           {% endfor %}
@@ -104,14 +154,6 @@
       </table>
     </div>
   </div>
-</div>
-
-<!-- Footer projet -->
-<div class="text-center text-muted py-4 border-top">
-  <p class="mb-1">
-    <strong>BloodConnect</strong> — Projet d'évaluation Django · ISET Sfax
-  </p>
-  <p class="small mb-0">Développement Web avec Django · Année universitaire 2025–2026</p>
 </div>
 
 {% endblock %}

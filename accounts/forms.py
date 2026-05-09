@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import Donneur, Hopital
+from datetime import date
 
 class InscriptionDonneurForm(forms.ModelForm):
     # Champs User
@@ -31,6 +32,15 @@ class InscriptionDonneurForm(forms.ModelForm):
         if User.objects.filter(username=username).exists():
             raise forms.ValidationError('Ce nom d\'utilisateur est déjà pris.')
         return username
+
+    def clean_date_naissance(self):
+        date_naissance = self.cleaned_data.get('date_naissance')
+        if date_naissance:
+            today = date.today()
+            age = today.year - date_naissance.year - ((today.month, today.day) < (date_naissance.month, date_naissance.day))
+            if age < 18:
+                raise forms.ValidationError('Vous devez avoir au moins 18 ans pour vous inscrire.')
+        return date_naissance
 
 
 class InscriptionHopitalForm(forms.ModelForm):

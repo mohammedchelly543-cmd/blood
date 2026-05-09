@@ -36,6 +36,7 @@ class Donneur(models.Model):
     def __str__(self):
         return f"{self.user.get_full_name()} — {self.groupe_sanguin}"
 
+    @property
     def prochain_don(self):
         from donations.models import Don
         from datetime import timedelta
@@ -48,10 +49,11 @@ class Donneur(models.Model):
         jours = 56 if self.sexe == 'M' else 84
         return dernier.date_don + timedelta(days=jours)
 
+    @property
     def est_eligible(self):
         from datetime import date
 
-        prochain = self.prochain_don()
+        prochain = self.prochain_don
         if not prochain:
             return True
         return date.today() >= prochain

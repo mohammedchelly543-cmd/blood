@@ -38,7 +38,7 @@ def detail_campagne(request, pk):
 def inscrire_campagne(request, pk):
     campagne = get_object_or_404(Campagne, pk=pk)
     donneur = request.user.donneur
-    if campagne.est_complete():
+    if campagne.est_complete:
         messages.error(request, 'Cette campagne est complète.')
         return redirect('detail_campagne', pk=pk)
     creneau = request.POST.get('creneau_horaire')

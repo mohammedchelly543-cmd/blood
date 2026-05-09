@@ -18,7 +18,6 @@ def inscription_donneur(request):
     if request.method == 'POST':
         form = InscriptionDonneurForm(request.POST)
         if form.is_valid():
-            # Créer le User
             user = User.objects.create_user(
                 username=form.cleaned_data['username'],
                 email=form.cleaned_data['email'],
@@ -26,9 +25,9 @@ def inscription_donneur(request):
                 first_name=form.cleaned_data['first_name'],
                 last_name=form.cleaned_data['last_name'],
             )
-            # Créer le Donneur lié
             donneur = form.save(commit=False)
             donneur.user = user
+            donneur.actif = True
             donneur.save()
             messages.success(request, 'Compte créé avec succès ! Vous pouvez vous connecter.')
             return redirect('login')
@@ -41,16 +40,21 @@ def inscription_hopital(request):
     if request.method == 'POST':
         form = InscriptionHopitalForm(request.POST)
         if form.is_valid():
-            user = User.objects.create_user(
-                username=form.cleaned_data['username'],
-                email=form.cleaned_data['email'],
-                password=form.cleaned_data['password1'],
-            )
-            hopital = form.save(commit=False)
-            hopital.user = user
-            hopital.save()
-            messages.success(request, 'Demande envoyée ! Votre compte sera validé par un administrateur.')
-            return redirect('login')
+            # Validate form FIRST, then create user to avoid orphan User objects
+            if User.objects.filter(username=form.cleaned_data['username']).exists():
+                form.add_error('username', 'Ce nom d\'utilisateur est déjà pris.')
+            else:
+                user = User.objects.create_user(
+                    username=form.cleaned_data['username'],
+                    email=form.cleaned_data['email'],
+                    password=form.cleaned_data['password1'],
+                )
+                hopital = form.save(commit=False)
+                hopital.user = user
+                hopital.valide = False
+                hopital.save()
+                messages.success(request, 'Demande envoyée ! Votre compte sera validé par un administrateur.')
+                return redirect('login')
     else:
         form = InscriptionHopitalForm()
     return render(request, 'accounts/register_hopital.html', {'form': form})
@@ -105,8 +109,8 @@ def dashboard_donneur(request):
         'donneur': donneur,
         'dons': dons,
         'demandes': demandes,
-        'eligible': donneur.est_eligible(),
-        'prochain_don': donneur.prochain_don(),
+        'eligible': donneur.est_eligible,
+        'prochain_don': donneur.prochain_don,
     }
     return render(request, 'accounts/dashboard_donneur.html', context)
 
@@ -142,9 +146,12 @@ def dashboard_admin(request):
         'hopitaux_attente': Hopital.objects.filter(valide=False),
     }
     return render(request, 'accounts/dashboard_admin.html', context)
+
+
 @admin_required
 def valider_hopital(request, hopital_id):
-    hopital = Hopital.objects.get(id=hopital_id)
+    from django.shortcuts import get_object_or_404
+    hopital = get_object_or_404(Hopital, id=hopital_id)
     hopital.valide = True
     hopital.save()
     messages.success(request, f'Hôpital "{hopital.nom}" validé avec succès.')

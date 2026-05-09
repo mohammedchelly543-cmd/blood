@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}{% if modifier %}Modifier la demande{% else %}Nouvelle demande urgente{% endif %} — BloodConnect{% endblock %}
+
+{% block content %}
+<div class="page-header fade-up">
+  <div>
+    <h1><i class="bi bi-exclamation-circle-fill" style="color:var(--red)"></i>
+      {% if modifier %}Modifier la demande{% else %}Nouvelle demande urgente{% endif %}
+    </h1>
+    <p>{% if modifier %}Mettez à jour les informations de la demande.{% else %}Publiez un appel urgent pour un groupe sanguin spécifique.{% endif %}</p>
+  </div>
+  <a href="{% url 'dashboard_hopital' %}" class="btn btn-ghost">
+    <i class="bi bi-arrow-left"></i> Retour
+  </a>
+</div>
+
+<div class="fade-up-2" style="max-width:600px;">
+  <div class="card">
+    <div class="card-header danger">
+      <span><i class="bi bi-droplet-fill"></i> Informations de la demande</span>
+    </div>
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="bc-alert danger">
+            <i class="bi bi-x-circle"></i>
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        <div class="form-group">
+          <label class="form-label">Groupe sanguin requis</label>
+          <select name="{{ form.groupe_sanguin.html_name }}" class="form-select">
+            {% for value, label in form.groupe_sanguin.field.choices %}
+              <option value="{{ value }}" {% if form.groupe_sanguin.value == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+          {% if form.groupe_sanguin.errors %}
+            <div class="form-error">{{ form.groupe_sanguin.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Quantité (nombre de poches)</label>
+          <input type="number" name="{{ form.quantite.html_name }}"
+                 value="{{ form.quantite.value|default:'' }}"
+                 class="form-control" min="1" placeholder="Ex : 5">
+          {% if form.quantite.errors %}
+            <div class="form-error">{{ form.quantite.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Date limite</label>
+          <input type="date" name="{{ form.delai.html_name }}"
+                 value="{{ form.delai.value|default:'' }}"
+                 class="form-control">
+          {% if form.delai.errors %}
+            <div class="form-error">{{ form.delai.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description <span style="color:var(--ink-light);font-weight:400">(optionnel)</span></label>
+          <textarea name="{{ form.description.html_name }}"
+                    class="form-control" rows="3"
+                    placeholder="Contexte clinique, urgence particulière…">{{ form.description.value|default:'' }}</textarea>
+          {% if form.description.errors %}
+            <div class="form-error">{{ form.description.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div style="display:flex;gap:.75rem;margin-top:1.5rem;">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-{% if modifier %}pencil{% else %}send{% endif %}"></i>
+            {% if modifier %}Enregistrer les modifications{% else %}Publier la demande{% endif %}
+          </button>
+          <a href="{% url 'dashboard_hopital' %}" class="btn btn-ghost">Annuler</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,29 +1,69 @@
 {% extends 'base.html' %}
-{% block title %}Connexion{% endblock %}
+{% block title %}Connexion — BloodConnect{% endblock %}
+
+{% block extra_css %}
+<style>
+  .auth-wrap {
+    max-width: 440px; margin: 3rem auto;
+  }
+  .auth-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .auth-top {
+    background: linear-gradient(135deg, var(--red), #8B0F0B);
+    padding: 2rem; text-align: center; color: white;
+  }
+  .auth-top .drop-logo {
+    width: 52px; height: 52px; background: rgba(255,255,255,.2);
+    border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto .75rem;
+  }
+  .auth-top .drop-logo::after {
+    content: '';
+    width: 20px; height: 20px;
+    background: white; border-radius: 50%;
+  }
+  .auth-top h2 {
+    font-family: var(--font-display); font-size: 1.4rem; font-weight: 800;
+  }
+  .auth-top p { font-size: .85rem; opacity: .8; margin-top: .3rem; }
+  .auth-body { padding: 1.75rem; }
+  .auth-footer { text-align: center; font-size: .85rem; color: var(--ink-light); padding-top: 1rem; border-top: 1px solid var(--border); margin-top: 1.25rem; }
+  .auth-footer a { color: var(--red); text-decoration: none; font-weight: 600; }
+  .auth-footer a:hover { text-decoration: underline; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-5">
-    <div class="card shadow-sm">
-      <div class="card-body p-4">
-        <h3 class="text-center mb-4 text-danger">Connexion</h3>
-        <form method="post">
-          {% csrf_token %}
-          <div class="mb-3">
-            <label class="form-label">Nom d'utilisateur</label>
-            <input type="text" name="username" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Mot de passe</label>
-            <input type="password" name="password" class="form-control" required>
-          </div>
-          <button type="submit" class="btn btn-danger w-100">Se connecter</button>
-        </form>
-        <hr>
-        <p class="text-center text-muted small">
-          Pas encore inscrit ?
-          <a href="{% url 'register_donneur' %}">Donneur</a> /
-          <a href="{% url 'register_hopital' %}">Hôpital</a>
-        </p>
+<div class="auth-wrap fade-up">
+  <div class="auth-card">
+    <div class="auth-top">
+      <div class="drop-logo"></div>
+      <h2>Bon retour !</h2>
+      <p>Connectez-vous à votre espace BloodConnect</p>
+    </div>
+    <div class="auth-body">
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">Nom d'utilisateur</label>
+          <input type="text" name="username" class="form-control" placeholder="votre_identifiant" required autofocus>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mot de passe</label>
+          <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; margin-top:.5rem; padding:.7rem; font-size:.95rem;">
+          <i class="bi bi-box-arrow-in-right"></i> Se connecter
+        </button>
+      </form>
+      <div class="auth-footer">
+        Pas encore inscrit ?
+        <a href="{% url 'register_donneur' %}">Donneur</a> ·
+        <a href="{% url 'register_hopital' %}">Hôpital</a>
       </div>
     </div>
   </div>

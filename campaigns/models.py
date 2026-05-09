@@ -14,11 +14,13 @@ class Campagne(models.Model):
     def __str__(self):
         return f"{self.nom} — {self.date}"
 
+    @property
     def places_restantes(self):
         return self.capacite_totale - self.inscriptions.count()
 
+    @property
     def est_complete(self):
-        return self.places_restantes() <= 0
+        return self.places_restantes <= 0
 
 
 class Inscription(models.Model):

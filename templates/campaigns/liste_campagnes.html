@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Campagnes de don — BloodConnect{% endblock %}
+
+{% block extra_css %}
+<style>
+  .campaign-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); overflow: hidden;
+    transition: box-shadow .2s, transform .2s; height: 100%;
+  }
+  .campaign-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+  .campaign-card-accent {
+    height: 5px;
+    background: linear-gradient(90deg, var(--red), #FF6B6B);
+  }
+  .campaign-card-body { padding: 1.3rem; }
+  .campaign-card-body h3 {
+    font-family: var(--font-display); font-size: 1.05rem; font-weight: 700;
+    margin-bottom: .35rem;
+  }
+  .campaign-meta { display: flex; flex-direction: column; gap: .45rem; margin: .85rem 0; }
+  .campaign-meta-item { display: flex; align-items: center; gap: .5rem; font-size: .85rem; color: var(--ink-mid); }
+  .campaign-meta-item i { color: var(--red); width: 16px; flex-shrink: 0; }
+  .campaign-card-footer {
+    padding: .85rem 1.3rem; border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; gap:.5rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header fade-up">
+  <div>
+    <h1>Campagnes de don</h1>
+    <p>Inscrivez-vous aux collectes de sang organisées par les hôpitaux.</p>
+  </div>
+</div>
+
+{% if campagnes %}
+  <div class="grid grid-2 fade-up-2">
+    {% for campagne in campagnes %}
+    <div class="campaign-card">
+      <div class="campaign-card-accent"></div>
+      <div class="campaign-card-body">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:.5rem;">
+          <h3>{{ campagne.nom }}</h3>
+          {% if campagne.est_complete %}
+            <span class="badge badge-red">Complet</span>
+          {% else %}
+            <span class="badge badge-green">{{ campagne.places_restantes }} place{% if campagne.places_restantes != 1 %}s{% endif %}</span>
+          {% endif %}
+        </div>
+        <div style="font-size:.82rem; color:var(--ink-light);">{{ campagne.hopital.nom }}</div>
+
+        <div class="campaign-meta">
+          <div class="campaign-meta-item">
+            <i class="bi bi-calendar-event"></i>
+            {{ campagne.date|date:"l d F Y" }}
+          </div>
+          <div class="campaign-meta-item">
+            <i class="bi bi-geo-alt-fill"></i>
+            {{ campagne.lieu }}
+          </div>
+          <div class="campaign-meta-item">
+            <i class="bi bi-droplet-fill"></i>
+            Groupes ciblés : <strong style="margin-left:.25rem;">{{ campagne.groupes_cibles }}</strong>
+          </div>
+          <div class="campaign-meta-item">
+            <i class="bi bi-people-fill"></i>
+            {{ campagne.inscriptions.count }} / {{ campagne.capacite_totale }} inscrits
+          </div>
+        </div>
+
+        {% if campagne.description %}
+          <p style="font-size:.85rem; color:var(--ink-mid);">{{ campagne.description }}</p>
+        {% endif %}
+      </div>
+      <div class="campaign-card-footer">
+        <span style="font-size:.78rem; color:var(--ink-light);">Créée le {{ campagne.date_creation|date:"d/m/Y" }}</span>
+        <a href="{% url 'detail_campagne' campagne.pk %}" class="btn btn-primary btn-sm">
+          Voir la campagne <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card fade-up-2">
+    <div class="empty-state" style="padding:4rem 1rem;">
+      <i class="bi bi-calendar-x" style="color:var(--ink-light);"></i>
+      <p style="font-size:1rem; font-weight:600;">Aucune campagne programmée.</p>
+      <p style="font-size:.85rem; margin-top:.25rem;">Revenez bientôt pour voir les prochaines collectes.</p>
+    </div>
+  </div>
+{% endif %}
+
+{% endblock %}

@@ -30,6 +30,7 @@ class DemandeUrgente(models.Model):
     def __str__(self):
         return f"{self.groupe_sanguin} — {self.hopital.nom} ({self.statut})"
 
+    @property
     def nb_reponses(self):
         return self.reponses.filter(statut='confirme').count()
 
