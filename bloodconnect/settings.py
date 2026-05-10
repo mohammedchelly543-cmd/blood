@@ -17,17 +17,16 @@ CSRF_TRUSTED_ORIGINS = os.environ.get(
 ).split(',')
 
 # ─── HTTPS / Reverse-proxy Railway ───────────────────────────────────────────
-# Railway termine le TLS avant Gunicorn.
-# Sans ce réglage, Django pense être en HTTP → cookies non sécurisés → login bloqué.
+# Railway termine le TLS avant Gunicorn — sans ça Django pense être en HTTP.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST    = True
 
 # Cookies sécurisés — OBLIGATOIRES pour que le login admin fonctionne en HTTPS.
 # En local (DEBUG=True) ils restent False pour ne pas bloquer le développement.
-SESSION_COOKIE_SECURE    = not DEBUG
-CSRF_COOKIE_SECURE       = not DEBUG
-SESSION_COOKIE_SAMESITE  = 'Lax'
-CSRF_COOKIE_SAMESITE     = 'Lax'
+SESSION_COOKIE_SECURE   = not DEBUG
+CSRF_COOKIE_SECURE      = not DEBUG
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE    = 'Lax'
 
 # ─── Applications ─────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
@@ -107,7 +106,11 @@ USE_TZ = True
 STATIC_URL  = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static'] if (BASE_DIR / 'static').exists() else []
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# WhiteNoise sans manifest compressé — évite le crash healthcheck quand
+# staticfiles/ est absent du repo (présent dans .gitignore).
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ─── Auth ─────────────────────────────────────────────────────────────────────
